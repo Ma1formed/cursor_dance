@@ -1,0 +1,2866 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Хореография Кривых | Osu! Bot Project</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'],['\\(','\\)']],
+        displayMath: [['$$','$$'],['\\[','\\]']]
+      },
+      svg: { fontCache: 'global', scale: 1.0 },
+      options: { menuOptions: { settings: { zoom: 'None' } } }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root{
+      --accent-pink:#ff66aa;
+      --accent-pink-dim:rgba(255,102,170,.3);
+      --accent-blue:#66ccff;
+      --accent-blue-dim:rgba(102,204,255,.3);
+      --accent-yellow:#ffd966;
+      --accent-green:#66ffaa;
+      --text-primary:#fff;
+      --text-secondary:#d0d0d0;
+      --text-muted:#888;
+      --bg-glass:rgba(12,12,18,.93);
+      --border-subtle:rgba(255,255,255,.08);
+      --panel-width:min(520px,44vw);
+      --panel-max-height:88vh;
+      --panel-padding:clamp(20px,3vw,36px);
+      --font-h1:clamp(1.8rem,3.8vw,2.8rem);
+      --font-h2:clamp(1.2rem,2.4vw,1.7rem);
+      --font-h3:clamp(1rem,1.7vw,1.25rem);
+      --font-body:clamp(.85rem,1.3vw,1.05rem);
+      --font-small:clamp(.72rem,1vw,.85rem);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      background:#030308;
+      overflow:hidden;
+      font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      margin:0;
+      padding:0;
+    }
+
+    #math-canvas{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      width:100%;
+      height:100%;
+      background:radial-gradient(ellipse at 72% 48%,#14141e 0%,#09090f 55%,#000003 100%);
+    }
+
+    #interaction-overlay{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      pointer-events:none;
+    }
+    #interaction-overlay.dragging{
+      pointer-events:all;
+      cursor:grabbing;
+    }
+
+    .reveal{z-index:1}
+    .reveal .slides{text-align:left}
+    .reveal .slides section{height:100%;padding:0}
+
+    .slide-content{
+      position:absolute;
+      top:50%;
+      left:clamp(20px,5vw,72px);
+      transform:translateY(-50%);
+      width:var(--panel-width);
+      max-height:var(--panel-max-height);
+      z-index:10;
+    }
+
+    .glass{
+      background:var(--bg-glass);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border:1px solid var(--border-subtle);
+      border-left:3px solid var(--accent-pink);
+      padding:var(--panel-padding);
+      border-radius:0 14px 14px 0;
+      box-shadow:0 24px 64px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.04);
+      max-height:calc(var(--panel-max-height) - 20px);
+      overflow-y:auto;
+      scrollbar-width:thin;
+      scrollbar-color:var(--accent-pink) transparent;
+      animation:panelFadeIn .5s ease-out;
+    }
+
+    @keyframes panelFadeIn{
+      from{opacity:0;transform:translateX(-30px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+
+    .glass::-webkit-scrollbar{width:5px}
+    .glass::-webkit-scrollbar-track{background:transparent}
+    .glass::-webkit-scrollbar-thumb{background:var(--accent-pink);border-radius:3px}
+
+    .glass h1{
+      font-size:var(--font-h1);
+      color:var(--accent-pink);
+      text-shadow:0 0 40px rgba(255,102,170,.35);
+      margin:0 0 .5em;
+      line-height:1.15;
+      font-weight:700;
+    }
+    .glass h2{
+      font-size:var(--font-h2);
+      color:var(--text-primary);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:0 0 .35em;
+      margin:0 0 .65em;
+      line-height:1.2;
+      font-weight:600;
+    }
+    .glass h3{
+      font-size:var(--font-h3);
+      color:var(--accent-blue);
+      margin:.9em 0 .4em;
+      font-weight:500;
+    }
+    .glass p,
+    .glass li{
+      font-size:var(--font-body);
+      line-height:1.6;
+      color:var(--text-secondary);
+      margin:0 0 .7em;
+    }
+    .glass ul,
+    .glass ol{
+      margin:0 0 .9em;
+      padding-left:1.3em;
+    }
+    .glass li{margin:0 0 .35em}
+    .glass strong{color:#fff;font-weight:600}
+    .glass em{color:var(--accent-blue);font-style:italic}
+
+    .chapter-header{
+      font-size:var(--font-small);
+      text-transform:uppercase;
+      letter-spacing:2.5px;
+      color:var(--accent-blue);
+      margin:0 0 8px;
+      display:block;
+      opacity:.7;
+      border-bottom:1px solid var(--accent-blue-dim);
+      padding:0 0 4px;
+      width:fit-content;
+    }
+
+    .chapter-number{
+      font-size:var(--font-small);
+      text-transform:uppercase;
+      letter-spacing:2px;
+      color:var(--accent-blue);
+      display:inline-block;
+      margin-bottom:10px;
+      opacity:.9;
+    }
+
+    .subtitle{
+      color:var(--text-secondary);
+      font-weight:400;
+    }
+
+    .toc{font-size:.92em}
+
+    .MathJax,
+    mjx-container{
+      color:#fff !important;
+      outline:none !important;
+      text-align:center;
+      margin:.5em 0 !important;
+    }
+
+    .big-math{
+      font-size:clamp(.55rem,1.1vw,.95rem);
+      width:100%;
+      overflow:visible;
+    }
+
+    .chapter-slide .slide-content{
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:min(680px,88vw);
+      text-align:center;
+    }
+    .chapter-slide .glass{
+      border-left:none;
+      border-radius:14px;
+      background:rgba(8,8,14,.88);
+      border:1px solid rgba(255,102,170,.15);
+    }
+
+    button{
+      background:transparent;
+      border:1px solid var(--accent-pink);
+      color:var(--accent-pink);
+      padding:10px 22px;
+      font-size:.88rem;
+      cursor:pointer;
+      border-radius:6px;
+      transition:all .3s ease;
+      margin-top:10px;
+      font-weight:500;
+    }
+    button:hover{
+      background:var(--accent-pink);
+      color:#fff;
+      box-shadow:0 0 20px var(--accent-pink-dim);
+      transform:translateY(-1px);
+    }
+
+    .hint{
+      font-size:var(--font-small);
+      color:#666;
+      margin-top:16px;
+      border-top:1px dashed #2a2a2a;
+      padding-top:10px;
+    }
+
+    .term{
+      display:inline-block;
+      background:rgba(102,204,255,.1);
+      border:1px solid rgba(102,204,255,.2);
+      padding:1px 7px;
+      border-radius:4px;
+      font-size:.92em;
+      color:var(--accent-blue);
+    }
+
+    .warn-box{
+      background:rgba(255,60,60,.08);
+      border-left:3px solid #ff4444;
+      padding:10px 14px;
+      border-radius:0 8px 8px 0;
+      margin:.8em 0;
+    }
+    .warn-box p{color:#ff8888;margin:0 0 .3em}
+
+    .video-box{
+      width:100%;
+      aspect-ratio:16/9;
+      background:#0a0a0f;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #222;
+      margin:1em 0;
+      color:#444;
+      font-size:.85em;
+      border-radius:8px;
+    }
+
+    .qr-container{
+      display:flex;
+      gap:24px;
+      justify-content:center;
+      margin-top:20px;
+      flex-wrap:wrap;
+    }
+    .qr-box{background:#fff;padding:10px;border-radius:8px}
+    .qr-label{
+      display:block;
+      margin-top:6px;
+      font-size:.78rem;
+      color:#888;
+      text-align:center;
+    }
+
+    #chapter-progress{
+      position:fixed;
+      top:0;
+      left:0;
+      height:3px;
+      background:linear-gradient(90deg,var(--accent-pink),var(--accent-blue));
+      z-index:200;
+      transition:width .4s ease;
+      box-shadow:0 0 12px var(--accent-pink-dim);
+    }
+
+    #scene-label{
+      position:fixed;
+      bottom:16px;
+      right:20px;
+      font-size:.72rem;
+      color:rgba(255,255,255,.2);
+      z-index:200;
+      font-family:monospace;
+      letter-spacing:1px;
+    }
+
+    .nav-hint{
+      margin-top:1.5em;
+      opacity:.45;
+      font-size:.85em;
+      text-align:center;
+    }
+    .nav-hint kbd{
+      display:inline-block;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      padding:2px 8px;
+      border-radius:4px;
+      margin:0 2px;
+      font-family:monospace;
+    }
+
+    .formula-note{
+      font-size:var(--font-small);
+      color:#777;
+      text-align:center;
+      margin-top:-.3em;
+      margin-bottom:.8em;
+    }
+
+    .lerp-derivation .fragment,
+    .formula-note.fragment{display:none}
+
+    .lerp-stepper li.fragment.visible{display:list-item}
+
+    .lerp-derivation .fragment.visible,
+    .formula-note.fragment.visible{display:block}
+
+    .final-slide .glass{
+      text-align:center;
+      border-left:none;
+      border-radius:14px;
+    }
+
+    @media (max-width:768px){
+      :root{
+        --panel-width:calc(100vw - 30px);
+        --panel-max-height:55vh;
+      }
+      .slide-content{
+        left:15px;
+        top:auto;
+        bottom:15px;
+        transform:none;
+      }
+      .chapter-slide .slide-content{
+        top:50%;
+        transform:translate(-50%,-50%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="math-canvas"></canvas>
+  <div id="interaction-overlay"></div>
+  <div id="chapter-progress" style="width:0%"></div>
+  <div id="scene-label"></div>
+
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <section data-state="scene-intro" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <h1>Хореография Кривых</h1>
+              <h3 class="subtitle">или Как заставить компьютер танцевать</h3>
+              <p class="nav-hint"><kbd>↓</kbd> <kbd>→</kbd> для навигации · <kbd>Esc</kbd> обзор</p>
+            </div>
+          </div>
+        </section>
+        <section data-state="scene-intro">
+          <div class="slide-content">
+            <div class="glass">
+              <h2>Оглавление</h2>
+              <ol class="toc">
+                <li><strong>Хореография кривых</strong> — Что скрывается за плавностью</li>
+                <li><strong>Математика кривых</strong> — Кривые Безье</li>
+                <li><strong>Подружим кривые</strong> — Классы гладкости</li>
+                <li><strong>Соединим все вместе</strong> — Условия стыковки</li>
+                <li><strong>Учим компьютер решать уравнения</strong> — СЛАУ и алгоритм прогонки</li>
+                <li><strong>Как по маслу</strong> — Интерполирующий сплайн</li>
+                <li><strong>Компьютер танцует</strong> — Кривой балет</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-compare" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 1</span>
+              <h1>Хореография кривых</h1>
+              <p style="opacity:.6">Почему прямые — скучные</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-compare">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">1 · Хореография Кривых</span>
+              <h2>В мире кривых</h2>
+              <p>Справа — две кривые, проходящие через одни и те же точки.</p>
+              <p><strong style="color:#888">Серая</strong> — <span class="term">ломаная</span>: набор прямых линий, которые соединяют последовательные точки. Это выглядит грубо.</p>
+              <p><strong style="color:var(--accent-pink)">Розовая</strong> — <span class="term">сплайн</span>: кривая, плавно проходящая через каждую точку. Траектория выглядит естественной и однородной, без рывков.</p>
+              <p class="hint">Попробуйте перетащить точки мышью — обе линии обновятся.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-compare">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">1 · Хореография Кривых</span>
+              <h2>Что значит «плавно»?</h2>
+              <p><strong>Невооруженным глазом видно, что розовая кривая более <span class="term">гладкая</span>.</strong></p>
+              <p>Но как работает гладкость? Как создавать плавные кривые через заданные точки?</p>
+              <p>Давайте попробуем разобраться.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-quad" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 2</span>
+              <h1>Математика кривых</h1>
+              <p style="opacity:.6">Кривые Безье и их пределы</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-lerp-1d">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика кривых</span>
+              <h2>Интерполяция на прямой</h2>
+
+              <p>
+                Есть две точки <strong>A</strong> и <strong>B</strong>. Число <strong>t</strong> от 0 до 1 означает,
+                какую часть пути от A к B мы прошли.
+              </p>
+
+              <p class="fragment">Шаг от A к B на прямой — это разность:</p>
+              <div class="big-math fragment">$$ \Delta = B - A $$</div>
+
+              <p class="fragment">Если пройти только долю <strong>t</strong>, получаем:</p>
+              <div class="big-math fragment">$$ P(t) = A + t\,\Delta $$</div>
+
+              <div class="big-math fragment">$$ P(t) = A + t\,(B - A) $$</div>
+
+              <p class="hint">Справа: точка P бегает по “прямой”. Перетаскивайте A и B (они двигаются только по линии).</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-lerp">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика кривых</span>
+              <h2>Тот же принцип в 2D</h2>
+
+              <p class="fragment">
+                На экране у точки две координаты, поэтому делаем то же самое отдельно для <strong>x</strong> и <strong>y</strong>:
+              </p>
+
+              <div class="big-math fragment">
+                $$
+                \begin{aligned}
+                x(t) &= x_A + t\,(x_B - x_A)\\
+                y(t) &= y_A + t\,(y_B - y_A)
+                \end{aligned}
+                $$
+              </div>
+
+              <p class="fragment">Общая формула линейной интерполяции:</p>
+
+              <div class="big-math fragment">$$ P(t) = A + t\,(B - A) $$</div>
+              <div class="big-math fragment">$$ P(t) = (1-t)\,A + t\,B $$</div>
+
+              <p class="hint">Справа: обычная 2D LERP-визуализация (точка P скользит по отрезку).</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-control">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика Кривых</span>
+              <h2>Идея контрольной точки</h2>
+              <p>Два конца всегда дают прямую. Нужна третья сила — <strong style="color:var(--accent-yellow)">контрольная точка</strong>.</p>
+              <p>Она работает как магнит: притягивает линию, но линия через неё <em>не проходит</em>.</p>
+              <p>Эту идею независимо открыли <strong>Поль де Кастельжо</strong> (Citroën) и <strong>Пьер Безье</strong> (Renault) в 1960-х для проектирования автомобильных кузовов.</p>
+              <p class="hint">Жёлтая точка справа — контрольная. Двигайте её!</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-casteljau">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика кривых</span>
+              <h2>Алгоритм де Кастельжо: кривая из LERP</h2>
+
+              <p>Давайте попробуем создать кривую из <em>вложенных линейных интерполяций</em>.</p>
+
+              <p class="fragment" data-fragment-index="0"><strong>Шаг 1.</strong> Делаем два LERP по рёбрам контрольного многоугольника:</p>
+              <div class="big-math fragment" data-fragment-index="0">
+                $$
+                Q_0(t)=\operatorname{lerp}(P_0,P_1,t),\qquad
+                Q_1(t)=\operatorname{lerp}(P_1,P_2,t)
+                $$
+              </div>
+
+              <p class="fragment" data-fragment-index="1"><strong>Шаг 2.</strong> Теперь рассматриваем отрезок между точками $Q_0$ и $Q_1$:</p>
+
+              <p class="fragment" data-fragment-index="2"><strong>Шаг 3.</strong> И ещё один LERP по этому отрезку:</p>
+              <div class="big-math fragment" data-fragment-index="2">
+                $$ P(t)=\operatorname{lerp}(Q_0(t),Q_1(t),t) $$
+              </div>
+
+              <p class="fragment" data-fragment-index="3"><strong>Шаг 4.</strong> Когда $t$ бежит от 0 до 1, точка $P(t)$ рисует всю квадратичную кривую Безье.</p>
+
+              <p class="hint">Справа: каждый шаг появляется по <kbd>↓</kbd>. Точки можно перетаскивать.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-quad">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика Кривых</span>
+              <h2>Квадратичная Безье</h2>
+              <p>Три точки, полином степени 2</p>
+              <p>Быстрая и простая, но может сделать только дугу — <em>S-образные</em> изгибы ей недоступны.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-cubic">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика Кривых</span>
+              <h2>Кубическая Безье</h2>
+              <p>Добавим второй «магнит» — получим полином $t^3$</p>
+              <p>Это <strong>стандарт</strong> векторной графики (SVG, PostScript, шрифты TrueType).</p>
+              <p>Но что делать, если точек — 10, 50, 100?</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-runge">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика Кривых</span>
+              <h2>Интерполяция высокой степени: «улёт в космос»</h2>
+
+              <p>
+                Здесь строится <strong>одна</strong> кривая Безье степени <strong>N−1</strong>,
+                которая <strong>проходит через все N точек</strong> (глобальная интерполяция).
+              </p>
+
+              <div class="warn-box">
+                <p><strong>⚠ Важно:</strong></p>
+                <p>
+                  На равномерных узлах высокая степень становится <em>очень</em> чувствительной:
+                  сдвиньте одну точку на пару пикселей — и кривая начнёт сильно колебаться по всей длине.
+                </p>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <button onclick="resetRungeDemo()">Сброс</button>
+              </div>
+
+              <p class="hint">
+                Подсказка: попробуйте слегка сдвинуть <strong style="color:var(--accent-yellow)">жёлтую</strong> точку вверх/вниз.
+                По X точки зафиксированы, чтобы эффект был максимально наглядным.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-runge">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">2 · Математика Кривых</span>
+              <h2>Выход</h2>
+              <p>Вместо одного полинома степени $n$ будем <strong>склеивать</strong> цепочку кубических ($n=3$) кривых.</p>
+              <p>Каждый фрагмент прост и стабилен. Главный вопрос: <em>как склеить так, чтобы стык был незаметен?</em></p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-c0" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 3</span>
+              <h1>Подружим кривые</h1>
+              <p style="opacity:.6">Три уровня гладкости: $C^0$, $C^1$, $C^2$</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c0">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>Кривая из кусочков → важен стык</h2>
+
+              <p>
+                Траектория строится <strong>кусочками</strong> (сегментами).
+                Они встречаются в <strong>узлах</strong>.
+              </p>
+
+              <p class="fragment">Три уровня гладкости (от простого к “как по маслу”):</p>
+              <ul class="fragment">
+                <li><strong>$C^0$</strong>: совпала точка (нет разрыва)</li>
+                <li><strong>$C^1$</strong>: совпало направление движения (нет угла)</li>
+                <li><strong>$C^2$</strong>: совпала “плавность поворота” (нет рывка)</li>
+              </ul>
+
+              <p class="hint">Справа (scene-c0): пример “только $C^0$” — угол видно.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c0">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>$C^0$ — “не телепортируемся”</h2>
+
+              <div style="background:rgba(102,204,255,.08);border-left:3px solid var(--accent-blue);padding:10px 14px;border-radius:0 8px 8px 0;margin:.6em 0">
+                <p style="margin:0"><strong>$K$</strong> — узел стыка (общая точка соединения).</p>
+              </div>
+
+              <p>$C^0$ означает: оба сегмента сходятся в одну и ту же точку $K$.</p>
+
+              <div class="big-math fragment">$$\boxed{P_{\text{left}}(1)=P_{\text{right}}(0)=K}$$</div>
+
+              <p class="fragment">
+                Разрыва нет, но направление может смениться резко → будет <strong style="color:#ff6666">излом</strong>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c1">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>Производная — это “скорость”</h2>
+
+              <p>Если точка идёт по кривой $P(t)$, то:</p>
+              <div class="big-math fragment">$$\boxed{P'(t)\ \text{— скорость (куда и как быстро движемся)}}$$</div>
+
+              <p class="fragment">Если в узле скорость “до” и “после” разная — курсор обязан мгновенно изменить движение → видно угол.</p>
+              <p class="hint">Сейчас — 2 золотые формулы для кубической Безье.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c1">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>Золотые формулы: скорость Безье на концах</h2>
+
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:10px;margin:.6em 0">
+                <p style="margin:0">
+                  <strong>Сегмент $i$:</strong> $\boxed{(K_i,\ A_i,\ B_i,\ K_{i+1})}$<br>
+                  $K_i$ — узлы (через них проходит кривая), $A_i,B_i$ — “ручки” (контрольные точки).
+                </p>
+              </div>
+
+              <p class="fragment">Для кубической Безье скорость в начале и конце:</p>
+              <div class="big-math fragment">
+                $$
+                \boxed{B'_i(0)=3(A_i-K_i)},\qquad
+                \boxed{B'_i(1)=3(K_{i+1}-B_i)}
+                $$
+              </div>
+
+              <p class="fragment">То есть направление задают отрезки $K_i\!\to\!A_i$ и $B_i\!\to\!K_{i+1}$.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c1">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>$C^1$: подстановка → “зеркало ручек”</h2>
+
+              <div style="background:rgba(102,204,255,.08);border-left:3px solid var(--accent-blue);padding:10px 14px;border-radius:0 8px 8px 0;margin:.6em 0">
+                <p style="margin:0">
+                  В узле $K_i$ стыкуются:<br>
+                  слева $(K_{i-1},A_{i-1},B_{i-1},K_i)$ и справа $(K_i,A_i,B_i,K_{i+1})$.
+                </p>
+              </div>
+
+              <p class="fragment">Определение $C^1$ (скорости совпали):</p>
+              <div class="big-math fragment">$$\boxed{B'_{i-1}(1)=B'_i(0)}$$</div>
+
+              <p class="fragment">Подставляем формулы скоростей на концах:</p>
+              <div class="big-math fragment">$$3(K_i-B_{i-1})=3(A_i-K_i)$$</div>
+
+              <p class="fragment">Сокращаем на 3 и переносим:</p>
+              <div class="big-math fragment">$$\boxed{A_i+B_{i-1}=2K_i}$$</div>
+
+              <p class="fragment">Смысл: ручки вокруг $K_i$ стоят <strong>как в зеркале</strong> → касательная общая → угла нет.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c2">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>$C^2$: чтобы не было “рывка” — склеиваем ускорения</h2>
+
+              <p>
+                $C^1$ убирает угол. Но “рывок” может остаться: поворот меняется неравномерно.
+                Это про <strong>ускорение</strong> $P''(t)$.
+              </p>
+
+              <p class="fragment">Для сегмента $\boxed{(K_i,A_i,B_i,K_{i+1})}$:</p>
+              <div class="big-math fragment">
+                $$
+                \boxed{B''_i(0)=6(K_i-2A_i+B_i)},\qquad
+                \boxed{B''_i(1)=6(K_{i+1}-2B_i+A_i)}
+                $$
+              </div>
+
+              <p class="fragment">Определение $C^2$ в узле $K_i$:</p>
+              <div class="big-math fragment">$$\boxed{B''_{i-1}(1)=B''_i(0)}$$</div>
+
+              <p class="hint">Если хотите увидеть подстановку — следующий слайд. Если нет — можно сразу дальше.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c2">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>$C^2$: подстановка (коротко, по шагам)</h2>
+
+              <p class="fragment">Берём узел $K_i$ и пишем $C^2$:</p>
+              <div class="big-math fragment">$$B''_{i-1}(1)=B''_i(0)$$</div>
+
+              <p class="fragment">Подставляем концевые ускорения:</p>
+              <div class="big-math fragment">$$6(K_i-2B_{i-1}+A_{i-1})=6(K_i-2A_i+B_i)$$</div>
+
+              <p class="fragment">Делим на 6 и убираем одинаковое $K_i$:</p>
+              <div class="big-math fragment">$$A_{i-1}-2B_{i-1}=-2A_i+B_i$$</div>
+
+              <p class="fragment">
+                Дальше мы используем “зеркало” из $C^1$ (чтобы заменить $B$ через $A$ и узлы $K$).
+                В итоге в главе 4 получим удобную формулу “1–4–1”.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-c2">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">3 · Подружим кривые</span>
+              <h2>Главная демонстрация: $C^1$ vs $C^2$</h2>
+
+              <p>Справа две траектории через одни и те же узлы $K_i$:</p>
+              <ul>
+                <li><strong style="color:var(--accent-blue)">сверху</strong> — $C^1$: угла нет, но “поворот” может прыгать</li>
+                <li><strong style="color:var(--accent-pink)">снизу</strong> — $C^2$: поворот меняется плавно</li>
+              </ul>
+
+              <h3>Зелёные “зубчики”</h3>
+              <p>
+                Это индикатор “насколько сильно поворачиваем”.
+                Если на стыке зубчики резко меняются — движение ощущается менее плавным.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-matrix" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 4</span>
+              <h1>От гладкости — к уравнениям</h1>
+              <p style="opacity:.6">Как $C^1$ и $C^2$ превращаются в систему для ручек</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">4 · От гладкости — к уравнениям</span>
+              <h2>Обозначения: $K_i$, $A_i$, $B_i$</h2>
+
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:12px 14px;border-radius:10px;margin:.6em 0">
+                <p style="margin:0">
+                  Даны узлы $K_0,\dots,K_n$ (кривая проходит через них).<br>
+                  Каждый сегмент $i$ — кубическая Безье: $\boxed{(K_i,\ A_i,\ B_i,\ K_{i+1})}$.<br>
+                  $A_i$ и $B_i$ — ручки, которые мы хотим вычислить.
+                </p>
+              </div>
+
+              <p class="hint">Справа: узлы двигаются, ручки пересчитываются, сплайн остаётся $C^2$.</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">4 · От гладкости — к уравнениям</span>
+              <h2>Сначала $C^1$: получаем “зеркало” (и уменьшаем число неизвестных)</h2>
+
+              <p>Из главы 3 мы уже получили:</p>
+              <div class="big-math fragment">$$\boxed{A_i+B_{i-1}=2K_i}$$</div>
+
+              <p class="fragment">Это очень полезно: теперь многие $B$ можно выразить через $A$. Например, в узле $K_{i+1}$:</p>
+              <div class="big-math fragment">$$\boxed{A_{i+1}+B_i=2K_{i+1}}$$</div>
+
+              <p class="fragment">Отсюда сразу:</p>
+              <div class="big-math fragment">$$\boxed{B_i=2K_{i+1}-A_{i+1}} \quad (i=0..n-2)$$</div>
+
+              <p class="fragment">
+                Смысл: $B_i$ — это <strong>отражение</strong> $A_{i+1}$ относительно узла $K_{i+1}$.
+                Поэтому касательная в узле автоматически общая → $C^1$ держится.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">4 · От гладкости — к уравнениям</span>
+              <h2>Теперь $C^2$: получается “1–4–1” (главная формула)</h2>
+
+              <p>
+                Когда мы требуем $C^2$ (ускорение непрерывно) и подставляем $B_i=2K_{i+1}-A_{i+1}$,
+                получается связь соседних ручек:
+              </p>
+
+              <div class="big-math fragment">$$\boxed{A_{i-1}+4A_i+A_{i+1}=4K_i+2K_{i+1}}$$</div>
+
+              <div class="warn-box fragment">
+                <p><strong>Смысл:</strong></p>
+                <p>ручка $A_i$ не свободна — она должна согласоваться с соседями, иначе “поворот” прыгнет и $C^2$ сломается.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">4 · От гладкости — к уравнениям</span>
+              <h2>Подстановка до конца (коротко)</h2>
+
+              <p class="fragment">После $C^2$ и сокращений (см. главу 3) у нас было:</p>
+              <div class="big-math fragment">$$A_{i-1}-2B_{i-1}=-2A_i+B_i$$</div>
+
+              <p class="fragment">Подставляем “зеркальные” выражения из $C^1$:</p>
+              <div class="big-math fragment">$$B_{i-1}=2K_i-A_i,\qquad B_i=2K_{i+1}-A_{i+1}$$</div>
+
+              <p class="fragment">Упрощаем — и получаем:</p>
+              <div class="big-math fragment">$$\boxed{A_{i-1}+4A_i+A_{i+1}=4K_i+2K_{i+1}}$$</div>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">4 · От гладкости — к уравнениям</span>
+              <h2>Края + последний $B_{n-1}$</h2>
+
+              <p>Для внутренних узлов работает “1–4–1”. На самом начале и конце добавляют 2 краевых правила (чтобы кривая не закручивалась на краях).</p>
+
+              <p class="fragment">
+                После решения системы мы знаем все $A_i$.
+                Почти все $B_i$ — отражением, а самый последний:
+              </p>
+              <div class="big-math fragment">$$\boxed{B_{n-1}=\frac{K_n+A_{n-1}}{2}}$$</div>
+
+              <p class="fragment">И каждый сегмент готов: $\boxed{(K_i,\ A_i,\ B_i,\ K_{i+1})}$.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-matrix" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 5</span>
+              <h1>Учим компьютер решать уравнения</h1>
+              <p style="opacity:.6">Компьютер быстро решает систему и получает ручки</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-matrix">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">5 · Очень коротко</span>
+              <h2>Что делает программа</h2>
+
+              <ol>
+                <li class="fragment">Берёт узлы $K_0,\dots,K_n$ (то, что вы двигаете)</li>
+                <li class="fragment">
+                  Записывает уравнения гладкости для ручек $A_i,B_i$:
+                  “зеркало” ($C^1$) и “1–4–1” ($C^2$)
+                </li>
+                <li class="fragment">
+                  Быстро решает систему (использует матричное представление и алгоритм прогонки) → получает $A_i$
+                  → считает $B_i$ как отражения → строит сегменты $\boxed{(K_i,A_i,B_i,K_{i+1})}$
+                </li>
+              </ol>
+
+              <div class="warn-box fragment">
+                <p><strong>Главная мысль:</strong></p>
+                <p>мы задаём правила “что значит плавно” — и из них рождаются уравнения, которые решает компьютер.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-spline" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 6</span>
+              <h1>Как по маслу</h1>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-spline">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">6 · Результат</span>
+              <h2>$C^2$-интерполирующий сплайн</h2>
+              <p>Компьютер получает набор точек и строит через <strong>каждую</strong> из них идеально гладкий путь.</p>
+              <p>Линия минимизирует интеграл квадрата кривизны — это буквально поведение упругой физической рейки.</p>
+              <button onclick="generateRandomSpline()">🎲 Новые точки</button>
+              <p class="hint">Или перетащите точки вручную.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section data-state="scene-osu" class="chapter-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-number">ГЛАВА 7</span>
+              <h1>Компьютер танцует</h1>
+              <p style="opacity:.6">Сплайны в ритм-игре osu!</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-osu">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">7 · Osu! Bot</span>
+              <h2>Как играет человек</h2>
+              <p><strong>osu!</strong> — ритм-игра: круги появляются на экране, игрок наводит курсор и кликает в такт музыке.</p>
+              <p>Человек использует резкие «снапы» — быстрые прямолинейные броски курсора к следующей цели.</p>
+              <div class="video-box">[ВИДЕО: геймплей человека]</div>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-osu">
+          <div class="slide-content">
+            <div class="glass">
+              <span class="chapter-header">7 · Osu! Bot</span>
+              <h2>Cursor Dance Bot</h2>
+              <p>Применим $C^2$-сплайны к движению курсора.</p>
+              <p>Бот «знает» координаты и тайминги всех будущих нот. Он строит плавную траекторию и <em>танцует</em> по ней, попадая в каждый круг точно в нужный момент.</p>
+              <div class="video-box">[ВИДЕО: Cursor Dance бота]</div>
+              <p class="hint">Справа — симуляция: курсор летит по сплайну через «ноты».</p>
+            </div>
+          </div>
+        </section>
+
+        <section data-state="scene-osu" class="final-slide">
+          <div class="slide-content">
+            <div class="glass">
+              <h2>Спасибо за внимание!</h2>
+              <p>Теперь вы знаете, какая математика стоит за «просто красивой линией».</p>
+              <div class="qr-container">
+                <div>
+                  <div class="qr-box"><div id="qr-code"></div></div>
+                  <span class="qr-label">GitHub</span>
+                </div>
+                <div>
+                  <div class="qr-box"><div id="qr-tg"></div></div>
+                  <span class="qr-label">Telegram</span>
+                </div>
+              </div>
+              <button onclick="resetOsuGame()" style="margin-top:18px">🔄 Новый паттерн</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    (() => {
+      'use strict';
+
+      class Vec2 {
+        constructor(x, y) { this.x = x; this.y = y; }
+        add(v) { return new Vec2(this.x + v.x, this.y + v.y); }
+        sub(v) { return new Vec2(this.x - v.x, this.y - v.y); }
+        mult(s) { return new Vec2(this.x * s, this.y * s); }
+        len() { return Math.hypot(this.x, this.y); }
+        dist(v) { return Math.hypot(this.x - v.x, this.y - v.y); }
+        lerp(v, t) { return new Vec2(this.x + (v.x - this.x) * t, this.y + (v.y - this.y) * t); }
+        copy() { return new Vec2(this.x, this.y); }
+      }
+
+      const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+      const smoothstep = (x) => {
+        x = clamp01(x);
+        return x * x * (3 - 2 * x);
+      };
+
+      const pingPongWithHolds = (time, speed = 0.22, hold = 0.14) => {
+        const u = (time * speed) % 1;
+        const r = (1 - 2 * hold) / 2;
+        if (r <= 1e-6) return 0;
+        if (u < hold) return 0;
+        if (u < hold + r) return smoothstep((u - hold) / r);
+        if (u < hold + r + hold) return 1;
+        return 1 - smoothstep((u - (hold + r + hold)) / r);
+      };
+
+      const rampUpHoldReset = (time, speed = 0.17, holdEnd = 0.22) => {
+        const u = (time * speed) % 1;
+        const ramp = 1 - holdEnd;
+        if (ramp <= 1e-6) return 1;
+        if (u < ramp) return smoothstep(u / ramp);
+        return 1;
+      };
+
+      const getBezierPoint = (pts, t) => {
+        if (pts.length === 1) return pts[0];
+        const next = [];
+        for (let i = 0; i < pts.length - 1; i++) next.push(pts[i].lerp(pts[i + 1], t));
+        return getBezierPoint(next, t);
+      };
+
+      const bezierDerivative = (pts, t) => {
+        const n = pts.length - 1;
+        const d = [];
+        for (let i = 0; i < n; i++) d.push(pts[i + 1].sub(pts[i]).mult(n));
+        return getBezierPoint(d, t);
+      };
+
+      const bezierSecondDerivative = (pts, t) => {
+        const n = pts.length - 1;
+        const d = [];
+        for (let i = 0; i < n; i++) d.push(pts[i + 1].sub(pts[i]).mult(n));
+        const m = d.length - 1;
+        const dd = [];
+        for (let i = 0; i < m; i++) dd.push(d[i + 1].sub(d[i]).mult(m));
+        return getBezierPoint(dd, t);
+      };
+
+      const signedCurvature = (pts, t) => {
+        const d1 = bezierDerivative(pts, t);
+        const d2 = bezierSecondDerivative(pts, t);
+        const cross = d1.x * d2.y - d1.y * d2.x;
+        const speed = Math.pow(d1.x * d1.x + d1.y * d1.y, 1.5);
+        return speed > 1e-8 ? cross / speed : 0;
+      };
+
+      const solveC2Spline = (knots) => {
+        const n = knots.length - 1;
+        if (n < 1) return [];
+
+        if (n === 1) {
+          const p1 = knots[0].lerp(knots[1], 0.33);
+          const p2 = knots[0].lerp(knots[1], 0.66);
+          return [[knots[0], p1, p2, knots[1]]];
+        }
+
+        const rhs = [];
+        rhs[0] = knots[0].add(knots[1].mult(2));
+        for (let i = 1; i < n - 1; i++) rhs[i] = knots[i].mult(4).add(knots[i + 1].mult(2));
+        rhs[n - 1] = knots[n - 1].mult(8).add(knots[n]);
+
+        const a = new Array(n).fill(1);
+        const b = new Array(n).fill(4);
+        const c = new Array(n).fill(1);
+        b[0] = 2;
+        b[n - 1] = 7;
+        a[n - 1] = 2;
+
+        for (let i = 1; i < n; i++) {
+          const m = a[i] / b[i - 1];
+          b[i] -= m * c[i - 1];
+          rhs[i] = rhs[i].sub(rhs[i - 1].mult(m));
+        }
+
+        const P1 = [];
+        P1[n - 1] = rhs[n - 1].mult(1 / b[n - 1]);
+        for (let i = n - 2; i >= 0; i--) P1[i] = rhs[i].sub(P1[i + 1].mult(c[i])).mult(1 / b[i]);
+
+        const P2 = [];
+        for (let i = 0; i < n - 1; i++) P2[i] = knots[i + 1].mult(2).sub(P1[i + 1]);
+        P2[n - 1] = knots[n].add(P1[n - 1]).mult(0.5);
+
+        const segs = [];
+        for (let i = 0; i < n; i++) segs.push([knots[i], P1[i], P2[i], knots[i + 1]]);
+        return segs;
+      };
+
+      const solveC1BezierChain = (knots, tension = 0.85) => {
+        const n = knots.length - 1;
+        if (n < 1) return [];
+
+        if (n === 1) {
+          const p0 = knots[0];
+          const p3 = knots[1];
+          const d = p3.sub(p0).mult(1 / 3);
+          return [[p0, p0.add(d), p3.sub(d), p3]];
+        }
+
+        const T = new Array(knots.length);
+
+        for (let i = 0; i <= n; i++) {
+          if (i === 0) T[i] = knots[1].sub(knots[0]).mult(tension);
+          else if (i === n) T[i] = knots[n].sub(knots[n - 1]).mult(tension);
+          else T[i] = knots[i + 1].sub(knots[i - 1]).mult(0.5 * tension);
+        }
+
+        const segs = [];
+        for (let i = 0; i < n; i++) {
+          const P0 = knots[i];
+          const P3 = knots[i + 1];
+          const C1 = P0.add(T[i].mult(1 / 3));
+          const C2 = P3.sub(T[i + 1].mult(1 / 3));
+          segs.push([P0, C1, C2, P3]);
+        }
+        return segs;
+      };
+
+      const canvas = document.getElementById('math-canvas');
+      const ctx = canvas.getContext('2d');
+      const overlay = document.getElementById('interaction-overlay');
+      const progressBar = document.getElementById('chapter-progress');
+      const sceneLabel = document.getElementById('scene-label');
+
+      let W = 0;
+      let H = 0;
+
+      let points = [];
+      let scene = 'scene-intro';
+      let vizEnabled = true;
+
+      let draggedPoint = null;
+      let isDragging = false;
+
+      let time = 0;
+      let particles = [];
+
+      let compareOffset = 260;
+
+      let casteljauStageTarget = 0;
+      let casteljauStageAnim = 0;
+
+      let c1MasterIndex = 2;
+      let c2CompareOffset = 170;
+      let c2LastHitLayer = 0;
+      let c2DragLayer = 0;
+
+      let osuPath = [];
+      let osuProgress = 0;
+      let osuSegmentIndex = 0;
+      const osuSpeed = 0.012;
+      let osuTrail = [];
+
+      const sceneStore = new Map();
+
+      const resize = () => {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+      };
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      const getVizCenter = () => (W < 768 ? { x: W / 2, y: H * 0.3 } : { x: W * 0.66, y: H / 2 });
+
+      const clonePoints = (arr) => arr.map((p) => {
+        const q = new Vec2(p.x, p.y);
+        for (const k in p) if (k !== 'x' && k !== 'y') q[k] = p[k];
+        return q;
+      });
+
+      const saveSceneState = () => {
+        if (!vizEnabled) return;
+        if (!scene || scene === 'scene-none') return;
+        if (scene === 'scene-intro' || scene === 'scene-osu') return;
+
+        const payload = { points: clonePoints(points), extra: {} };
+
+        if (scene === 'scene-c1') payload.extra.c1MasterIndex = c1MasterIndex;
+        if (scene === 'scene-c2') payload.extra.c2CompareOffset = c2CompareOffset;
+        if (scene === 'scene-compare') payload.extra.compareOffset = compareOffset;
+        if (scene === 'scene-runge') payload.extra.rungeHotIndex = rungeHotIndex;
+
+        sceneStore.set(scene, payload);
+      };
+
+      const setVizEnabled = (on) => {
+        vizEnabled = on;
+        if (on) return;
+
+        scene = 'scene-none';
+        points = [];
+        draggedPoint = null;
+        isDragging = false;
+        overlay.classList.remove('dragging');
+        canvas.style.cursor = 'default';
+        sceneLabel.textContent = '';
+      };
+
+      const tryRestoreSceneState = (sceneName) => {
+        const saved = sceneStore.get(sceneName);
+        if (!saved) return false;
+
+        points = clonePoints(saved.points);
+
+        if (sceneName === 'scene-c1' && saved.extra.c1MasterIndex != null) c1MasterIndex = saved.extra.c1MasterIndex;
+        if (sceneName === 'scene-c2' && saved.extra.c2CompareOffset != null) c2CompareOffset = saved.extra.c2CompareOffset;
+        if (sceneName === 'scene-compare' && saved.extra.compareOffset != null) compareOffset = saved.extra.compareOffset;
+
+        if (sceneName === 'scene-runge') {
+          if (saved.extra.rungeHotIndex != null) rungeHotIndex = saved.extra.rungeHotIndex;
+          ensureRungeSystem();
+        }
+
+        return true;
+      };
+
+      const initParticles = () => {
+        particles = [];
+        for (let i = 0; i < 40; i++) {
+          particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            r: Math.random() * 1.5 + 0.5,
+            a: Math.random() * 0.3 + 0.05
+          });
+        }
+      };
+
+      const drawParticles = () => {
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = W;
+          if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H;
+          if (p.y > H) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,102,170,${p.a})`;
+          ctx.fill();
+        }
+      };
+
+      initParticles();
+
+      const HIT_RADIUS = 50;
+
+      const isDraggableScene = () => vizEnabled && scene !== 'scene-osu' && scene !== 'scene-intro' && scene !== 'scene-none';
+
+      const getPointerXY = (e) => {
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
+      };
+
+      const findClosestPoint = (mx, my) => {
+        let best = null;
+        let bestD = HIT_RADIUS;
+
+        if (scene === 'scene-c2') {
+          const off = c2CompareOffset;
+          c2LastHitLayer = 0;
+
+          for (const p of points) {
+            const d0 = Math.hypot(p.x - mx, p.y - my);
+            if (d0 < bestD) { bestD = d0; best = p; c2LastHitLayer = 0; }
+
+            const d1 = Math.hypot(p.x - mx, (p.y - off) - my);
+            if (d1 < bestD) { bestD = d1; best = p; c2LastHitLayer = 1; }
+          }
+          return best;
+        }
+
+        for (const p of points) {
+          const d = Math.hypot(p.x - mx, p.y - my);
+          if (d < bestD) { bestD = d; best = p; }
+        }
+        return best;
+      };
+
+      const onPointerDown = (e) => {
+        if (!isDraggableScene()) return;
+        const { x, y } = getPointerXY(e);
+        const hit = findClosestPoint(x, y);
+        if (!hit) return;
+
+        if (scene === 'scene-c1') {
+          if (hit === points[2]) c1MasterIndex = 2;
+          if (hit === points[4]) c1MasterIndex = 4;
+        }
+        if (scene === 'scene-c2') c2DragLayer = c2LastHitLayer;
+
+        draggedPoint = hit;
+        isDragging = true;
+        overlay.classList.add('dragging');
+        e.preventDefault();
+        e.stopPropagation();
+      };
+
+      const onPointerMove = (e) => {
+        const { x, y } = getPointerXY(e);
+
+        if (isDragging && draggedPoint) {
+          if (scene === 'scene-runge' && draggedPoint.fx != null) {
+            draggedPoint.x = draggedPoint.fx;
+            draggedPoint.y = (draggedPoint.fy != null) ? draggedPoint.fy : y;
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+
+          if (scene === 'scene-c1' && points.length >= 7) {
+            const p = points;
+            const K = p[3];
+
+            if (draggedPoint === K) {
+              const oldX = K.x;
+              const oldY = K.y;
+
+              K.x = x;
+              K.y = y;
+
+              const dx = K.x - oldX;
+              const dy = K.y - oldY;
+
+              p[1].x += dx; p[1].y += dy;
+              p[2].x += dx; p[2].y += dy;
+              p[4].x += dx; p[4].y += dy;
+              p[5].x += dx; p[5].y += dy;
+
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
+
+            if (draggedPoint === p[2]) c1MasterIndex = 2;
+            if (draggedPoint === p[4]) c1MasterIndex = 4;
+
+            draggedPoint.x = x;
+            draggedPoint.y = y;
+
+            const master = p[c1MasterIndex];
+            const otherIndex = (c1MasterIndex === 2) ? 4 : 2;
+
+            p[otherIndex].x = 2 * K.x - master.x;
+            p[otherIndex].y = 2 * K.y - master.y;
+
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+
+          if (scene === 'scene-c2') {
+            draggedPoint.x = x;
+            draggedPoint.y = y + (c2DragLayer === 1 ? c2CompareOffset : 0);
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+
+          draggedPoint.x = (draggedPoint.fx != null) ? draggedPoint.fx : x;
+          draggedPoint.y = (draggedPoint.fy != null) ? draggedPoint.fy : y;
+
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        if (isDraggableScene()) canvas.style.cursor = findClosestPoint(x, y) ? 'grab' : 'default';
+      };
+
+      const onPointerUp = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        draggedPoint = null;
+        overlay.classList.remove('dragging');
+        canvas.style.cursor = 'default';
+        e.preventDefault();
+        e.stopPropagation();
+      };
+
+      document.addEventListener('mousedown', onPointerDown, true);
+      document.addEventListener('mousemove', onPointerMove, true);
+      document.addEventListener('mouseup', onPointerUp, true);
+      document.addEventListener('touchstart', onPointerDown, { capture: true, passive: false });
+      document.addEventListener('touchmove', onPointerMove, { capture: true, passive: false });
+      document.addEventListener('touchend', onPointerUp, { capture: true, passive: false });
+      document.addEventListener('touchcancel', onPointerUp, { capture: true, passive: false });
+
+      overlay.addEventListener('mousemove', onPointerMove);
+      overlay.addEventListener('mouseup', onPointerUp);
+      overlay.addEventListener('touchmove', onPointerMove, { passive: false });
+      overlay.addEventListener('touchend', onPointerUp, { passive: false });
+
+      const colorWithAlpha = (col, a) => {
+        if (col.startsWith('#')) {
+          const r = parseInt(col.slice(1, 3), 16);
+          const g = parseInt(col.slice(3, 5), 16);
+          const b = parseInt(col.slice(5, 7), 16);
+          return `rgba(${r},${g},${b},${a})`;
+        }
+        if (col.startsWith('rgba(')) {
+          return col.replace(/rgba\((\s*\d+\s*),(\s*\d+\s*),(\s*\d+\s*),([^)]+)\)/, `rgba($1,$2,$3,${a})`);
+        }
+        if (col.startsWith('rgb(')) {
+          return col.replace('rgb(', 'rgba(').replace(')', `,${a})`);
+        }
+        return col;
+      };
+
+      const drawLine = (p1, p2, color = '#444', w = 1, dash = []) => {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = w;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.setLineDash(dash);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      };
+
+      const roundRectPath = (x, y, w, h, r = 8) => {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      };
+
+      const drawLabelPill = (text, xCenter, yTop, opts = {}) => {
+        const {
+          font = 'bold 14px monospace',
+          padX = 10,
+          padY = 6,
+          bg = 'rgba(0,0,0,0.38)',
+          border = 'rgba(255,255,255,0.10)',
+          color = 'rgba(255,255,255,0.92)',
+          r = 9
+        } = opts;
+
+        ctx.save();
+        ctx.font = font;
+
+        const m = /(\d+)px/.exec(font);
+        const fontSize = m ? parseInt(m[1], 10) : 14;
+
+        const tw = ctx.measureText(text).width;
+        const w = tw + padX * 2;
+        const h = fontSize + padY * 2;
+
+        const x = xCenter - w / 2;
+        const y = yTop;
+
+        roundRectPath(x, y, w, h, r);
+        ctx.fillStyle = bg;
+        ctx.fill();
+        ctx.strokeStyle = border;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, xCenter, y + h / 2 + 0.5);
+        ctx.restore();
+
+        return { x, y, w, h };
+      };
+
+      const drawSquareRangeBracket = (x1, x2, yTop, opts = {}) => {
+        const {
+          depth = 18,
+          color = 'rgba(255,102,170,0.95)',
+          w = 2.8,
+          glowW = 9,
+          glowA = 0.12
+        } = opts;
+
+        if (x2 < x1) [x1, x2] = [x2, x1];
+        if (x2 - x1 < 14) return;
+
+        const yBot = yTop + depth;
+
+        const strokeOnce = (lw, aMul) => {
+          ctx.beginPath();
+          ctx.moveTo(x1, yTop);
+          ctx.lineTo(x1, yBot);
+          ctx.lineTo(x2, yBot);
+          ctx.lineTo(x2, yTop);
+
+          ctx.strokeStyle = colorWithAlpha(color, aMul);
+          ctx.lineWidth = lw;
+          ctx.lineCap = 'butt';
+          ctx.lineJoin = 'miter';
+          ctx.miterLimit = 2;
+          ctx.stroke();
+        };
+
+        ctx.save();
+        strokeOnce(glowW, glowA);
+        strokeOnce(w, 1);
+        ctx.restore();
+      };
+
+      const drawEmphPoint = (p, fill = '#fff', r = 6, opts = {}) => {
+        const {
+          glowR = 16,
+          glowA = 0.26,
+          stroke = 'rgba(255,255,255,0.85)',
+          strokeW = 1.5
+        } = opts;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+        ctx.fillStyle = colorWithAlpha(fill, glowA);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = fill;
+        ctx.fill();
+
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = strokeW;
+        ctx.stroke();
+      };
+
+      const drawEmphPointMul = (p, fill, r, aMul, opts = {}) => {
+        if (aMul <= 0.001) return;
+        const {
+          glowR = 16,
+          glowA = 0.26,
+          stroke = 'rgba(255,255,255,0.85)',
+          strokeW = 1.5
+        } = opts;
+
+        drawEmphPoint(p, colorWithAlpha(fill, aMul), r, {
+          glowR,
+          glowA: glowA * aMul,
+          stroke: colorWithAlpha(stroke, aMul),
+          strokeW
+        });
+      };
+
+      const drawDashedEmphMul = (p1, p2, col, aMul, opts = {}) => {
+        if (aMul <= 0.001) return;
+        const {
+          dash = [10, 6],
+          w = 2,
+          glowW = 7,
+          glowA = 0.08
+        } = opts;
+
+        drawLine(p1, p2, colorWithAlpha(col, glowA * aMul), glowW, dash);
+        drawLine(p1, p2, colorWithAlpha(col, 1 * aMul), w, dash);
+      };
+
+      const drawDashedEmph = (p1, p2, col, opts = {}) => drawDashedEmphMul(p1, p2, col, 1, opts);
+
+      const drawPoint = (p, color = '#fff', size = 6, label = null) => {
+        const glowCol = color.startsWith('#') ? colorWithAlpha(color, 0.15) : colorWithAlpha(color, 0.15);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size + 4, 0, Math.PI * 2);
+        ctx.fillStyle = glowCol;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (isDraggableScene()) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, size + 10, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        if (label) {
+          ctx.fillStyle = '#aaa';
+          ctx.font = '13px monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(label, p.x + size + 8, p.y - 2);
+        }
+      };
+
+      const drawBezierCurve = (pts, color = '#ff66aa', w = 3, steps = 60) => {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i <= steps; i++) {
+          const p = getBezierPoint(pts, i / steps);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = w;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      };
+
+      const drawBezierCurvePartial = (pts, tMax, color = '#ff66aa', w = 3, steps = 160) => {
+        tMax = clamp01(tMax);
+        if (tMax <= 0) return;
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+
+        const maxI = Math.max(1, Math.floor(steps * tMax));
+        for (let i = 1; i <= maxI; i++) {
+          let t = i / steps;
+          if (t > tMax) t = tMax;
+          const p = getBezierPoint(pts, t);
+          ctx.lineTo(p.x, p.y);
+        }
+
+        const end = getBezierPoint(pts, tMax);
+        ctx.lineTo(end.x, end.y);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = w;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      };
+
+      const curvatureMag = (seg, t) => {
+        const k = Math.abs(signedCurvature(seg, t));
+        return Number.isFinite(k) ? k : 0;
+      };
+
+      const drawCurvatureJumpMarkersC1 = (c1Segments, knotsTop, opts = {}) => {
+        const {
+          scale = 950,
+          thresholdPx = 14,
+          color = 'rgba(255,68,68,0.85)'
+        } = opts;
+
+        if (c1Segments.length < 2) return;
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 4]);
+
+        for (let i = 0; i < c1Segments.length - 1; i++) {
+          const leftSeg = c1Segments[i];
+          const rightSeg = c1Segments[i + 1];
+
+          const kLeft = curvatureMag(leftSeg, 1);
+          const kRight = curvatureMag(rightSeg, 0);
+
+          const jumpPx = Math.abs(kLeft - kRight) * scale;
+          if (jumpPx < thresholdPx) continue;
+
+          const knot = knotsTop[i + 1];
+
+          ctx.beginPath();
+          ctx.arc(knot.x, knot.y, 12, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(knot.x, knot.y - 18);
+          ctx.lineTo(knot.x, knot.y - 8);
+          ctx.stroke();
+          ctx.setLineDash([5, 4]);
+        }
+
+        ctx.restore();
+      };
+
+      const drawCurvatureCombs = (segments, opts = {}) => {
+        const {
+          scale = 900,
+          step = 0.012,
+          maxLen = 95,
+          color = [100, 255, 140],
+          alpha = 0.42,
+          envelopeAlpha = 0.22,
+          drawEnvelope = true
+        } = opts;
+
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+        ctx.lineWidth = 1;
+
+        for (const seg of segments) {
+          for (let t = 0; t <= 1 + 1e-9; t += step) {
+            const p = getBezierPoint(seg, t);
+            const d1 = bezierDerivative(seg, t);
+
+            const speed2 = d1.x * d1.x + d1.y * d1.y;
+            if (speed2 < 1e-6) continue;
+
+            const speed = Math.sqrt(speed2);
+
+            const nx = -d1.y / speed;
+            const ny = d1.x / speed;
+
+            const k = Math.abs(signedCurvature(seg, t));
+            const L = clamp(k * scale, 0, maxLen);
+
+            const a = alpha * (0.35 + 0.65 * (L / maxLen));
+            ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},${a})`;
+
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + nx * L, p.y + ny * L);
+            ctx.stroke();
+          }
+        }
+
+        if (!drawEnvelope) return;
+
+        ctx.lineWidth = 1.25;
+        ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},${envelopeAlpha})`;
+
+        for (const seg of segments) {
+          let first = true;
+          ctx.beginPath();
+
+          for (let t = 0; t <= 1 + 1e-9; t += step) {
+            const p = getBezierPoint(seg, t);
+            const d1 = bezierDerivative(seg, t);
+
+            const speed2 = d1.x * d1.x + d1.y * d1.y;
+            if (speed2 < 1e-6) continue;
+
+            const speed = Math.sqrt(speed2);
+            const nx = -d1.y / speed;
+            const ny = d1.x / speed;
+
+            const k = Math.abs(signedCurvature(seg, t));
+            const L = clamp(k * scale, 0, maxLen);
+
+            const tx = p.x + nx * L;
+            const ty = p.y + ny * L;
+
+            if (first) { ctx.moveTo(tx, ty); first = false; }
+            else ctx.lineTo(tx, ty);
+          }
+
+          ctx.stroke();
+        }
+      };
+
+      const rungeN = 25;
+      let rungeT = [];
+      let rungeLUP = null;
+      let rungeHotIndex = 0;
+
+      const getRungePlot = () => {
+        const v = getVizCenter();
+        const w = Math.min(W * 0.58, 860);
+        const h = Math.min(H * 0.70, 560);
+
+        let left = v.x - w / 2;
+        left = Math.max(W * 0.40, left);
+        left = Math.min(W - 20 - w, left);
+
+        let top = v.y - h / 2;
+        top = Math.max(20, top);
+        top = Math.min(H - 20 - h, top);
+
+        return { left, top, w, h };
+      };
+
+      const bernsteinRow = (n, t) => {
+        const row = new Float64Array(n + 1);
+        if (t <= 0) { row[0] = 1; return row; }
+        if (t >= 1) { row[n] = 1; return row; }
+
+        const omt = 1 - t;
+        const ratio = t / omt;
+
+        let b = Math.pow(omt, n);
+        row[0] = b;
+
+        for (let j = 0; j < n; j++) {
+          b = b * (n - j) / (j + 1) * ratio;
+          row[j + 1] = b;
+        }
+        return row;
+      };
+
+      const lupDecompose = (A) => {
+        const n = A.length;
+        const LU = A.map((r) => Float64Array.from(r));
+        const P = new Int32Array(n);
+        for (let i = 0; i < n; i++) P[i] = i;
+
+        for (let k = 0; k < n; k++) {
+          let piv = k;
+          let best = Math.abs(LU[k][k]);
+
+          for (let i = k + 1; i < n; i++) {
+            const v = Math.abs(LU[i][k]);
+            if (v > best) { best = v; piv = i; }
+          }
+          if (best < 1e-14) throw new Error('scene-runge: ill-conditioned system');
+
+          if (piv !== k) {
+            const tmp = LU[k]; LU[k] = LU[piv]; LU[piv] = tmp;
+            const tp = P[k]; P[k] = P[piv]; P[piv] = tp;
+          }
+
+          for (let i = k + 1; i < n; i++) {
+            LU[i][k] /= LU[k][k];
+            const lik = LU[i][k];
+            for (let j = k + 1; j < n; j++) LU[i][j] -= lik * LU[k][j];
+          }
+        }
+
+        return { LU, P };
+      };
+
+      const lupSolve = (LU, P, b) => {
+        const n = LU.length;
+        const y = new Float64Array(n);
+        const x = new Float64Array(n);
+
+        for (let i = 0; i < n; i++) {
+          let sum = b[P[i]];
+          for (let j = 0; j < i; j++) sum -= LU[i][j] * y[j];
+          y[i] = sum;
+        }
+
+        for (let i = n - 1; i >= 0; i--) {
+          let sum = y[i];
+          for (let j = i + 1; j < n; j++) sum -= LU[i][j] * x[j];
+          x[i] = sum / LU[i][i];
+        }
+        return x;
+      };
+
+      const evalBezierBernstein = (ctrl, t) => {
+        const n = ctrl.length - 1;
+        if (n <= 0) return ctrl[0].copy();
+        if (t <= 0) return ctrl[0].copy();
+        if (t >= 1) return ctrl[n].copy();
+
+        const omt = 1 - t;
+        const ratio = t / omt;
+
+        let b = Math.pow(omt, n);
+        let x = ctrl[0].x * b;
+        let y = ctrl[0].y * b;
+
+        for (let j = 0; j < n; j++) {
+          b = b * (n - j) / (j + 1) * ratio;
+          x += ctrl[j + 1].x * b;
+          y += ctrl[j + 1].y * b;
+        }
+        return new Vec2(x, y);
+      };
+
+      const drawBezierCurveBernstein = (ctrl, color, w = 3, steps = 820) => {
+        const p0 = evalBezierBernstein(ctrl, 0);
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        for (let i = 1; i <= steps; i++) {
+          const t = i / steps;
+          const p = evalBezierBernstein(ctrl, t);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = w;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      };
+
+      const initRungeDemo = () => {
+        const plot = getRungePlot();
+        points = [];
+        rungeT = [];
+
+        const N = rungeN;
+        const n = N - 1;
+
+        const y0 = plot.top + plot.h * 0.55;
+
+        for (let i = 0; i < N; i++) {
+          const t = i / (N - 1);
+          const x = plot.left + t * plot.w;
+          const y = y0;
+
+          const p = new Vec2(x, y);
+          p.fx = x;
+          points.push(p);
+          rungeT.push(t);
+        }
+
+        rungeHotIndex = Math.floor((N - 1) / 2);
+
+        const A = new Array(N);
+        for (let i = 0; i < N; i++) A[i] = bernsteinRow(n, rungeT[i]);
+        rungeLUP = lupDecompose(A);
+      };
+
+      const ensureRungeSystem = () => {
+        if (rungeT.length === rungeN && rungeLUP) return;
+
+        rungeT = [];
+        for (let i = 0; i < rungeN; i++) rungeT.push(i / (rungeN - 1));
+
+        const n = rungeN - 1;
+        const A = new Array(rungeN);
+        for (let i = 0; i < rungeN; i++) A[i] = bernsteinRow(n, rungeT[i]);
+        rungeLUP = lupDecompose(A);
+      };
+
+      window.resetRungeDemo = () => initRungeDemo();
+
+      const drawSceneRunge = () => {
+        if (!rungeLUP || points.length !== rungeN) initRungeDemo();
+        const plot = getRungePlot();
+
+        ctx.fillStyle = 'rgba(0,0,0,0.14)';
+        ctx.fillRect(plot.left, plot.top, plot.w, plot.h);
+        ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(plot.left, plot.top, plot.w, plot.h);
+
+        ctx.beginPath();
+        ctx.moveTo(plot.left, plot.top + plot.h * 0.55);
+        ctx.lineTo(plot.left + plot.w, plot.top + plot.h * 0.55);
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.strokeStyle = 'rgba(102,204,255,0.12)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const N = points.length;
+        const bX = new Float64Array(N);
+        const bY = new Float64Array(N);
+        for (let i = 0; i < N; i++) { bX[i] = points[i].x; bY[i] = points[i].y; }
+
+        let solX = null;
+        let solY = null;
+
+        try {
+          solX = lupSolve(rungeLUP.LU, rungeLUP.P, bX);
+          solY = lupSolve(rungeLUP.LU, rungeLUP.P, bY);
+        } catch (_) {
+          solX = null;
+          solY = null;
+        }
+
+        if (solX && solY) {
+          const ctrl = new Array(N);
+          for (let j = 0; j < N; j++) ctrl[j] = new Vec2(solX[j], solY[j]);
+          drawBezierCurveBernstein(ctrl, 'rgba(255,102,170,0.92)', 3.6, 860);
+        }
+
+        ctx.font = '12px monospace';
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(255,255,255,0.40)';
+        ctx.fillText(`${N} узлов → степень ${N - 1} (глобальная интерполяция)`, plot.left + 10, plot.top + 10);
+
+        for (let i = 0; i < N; i++) {
+          const isHot = (i === rungeHotIndex);
+          const col = isHot ? '#ffd966' : '#66ccff';
+          const size = isHot ? 6.2 : 4.8;
+          drawPoint(points[i], col, size);
+        }
+      };
+
+      const initScene = (newScene) => {
+        scene = newScene;
+        points = [];
+        draggedPoint = null;
+        isDragging = false;
+        overlay.classList.remove('dragging');
+        osuTrail = [];
+
+        if (tryRestoreSceneState(scene)) {
+          sceneLabel.textContent = scene;
+          return;
+        }
+
+        const v = getVizCenter();
+        const sp = W < 768 ? 100 : 180;
+
+        sceneLabel.textContent = scene;
+
+        switch (scene) {
+          case 'scene-intro': {
+            for (let i = 0; i < 7; i++) points.push(new Vec2(v.x - sp * 1.5 + Math.random() * sp * 3, v.y - sp + Math.random() * sp * 2));
+            break;
+          }
+
+          case 'scene-compare': {
+            compareOffset = Math.round(Math.min(H * 0.28, W < 768 ? 190 : 280));
+            const dy = compareOffset * 0.5;
+
+            points = [
+              new Vec2(v.x - sp * 1.3, v.y + 60 + dy),
+              new Vec2(v.x - sp * 0.4, v.y - 120 + dy),
+              new Vec2(v.x + sp * 0.4, v.y + 80 + dy),
+              new Vec2(v.x + sp * 1.3, v.y - 60 + dy)
+            ];
+            break;
+          }
+
+          case 'scene-lerp':
+            points = [new Vec2(v.x - 160, v.y + 70), new Vec2(v.x + 160, v.y - 70)];
+            break;
+
+          case 'scene-lerp-1d': {
+            const y = v.y + 40;
+            const A = new Vec2(v.x - 220, y);
+            const B = new Vec2(v.x + 220, y);
+            A.fy = y;
+            B.fy = y;
+            points = [A, B];
+            break;
+          }
+
+          case 'scene-quad':
+            points = [new Vec2(v.x - 180, v.y + 110), new Vec2(v.x, v.y - 160), new Vec2(v.x + 180, v.y + 110)];
+            break;
+
+          case 'scene-cubic':
+            points = [new Vec2(v.x - 190, v.y + 110), new Vec2(v.x - 70, v.y - 130), new Vec2(v.x + 70, v.y - 130), new Vec2(v.x + 190, v.y + 110)];
+            break;
+
+          case 'scene-control':
+          case 'scene-casteljau':
+            points = [new Vec2(v.x - 180, v.y + 110), new Vec2(v.x, v.y - 160), new Vec2(v.x + 180, v.y + 110)];
+            break;
+
+          case 'scene-runge':
+            initRungeDemo();
+            break;
+
+          case 'scene-c0': {
+            const K0 = new Vec2(v.x - 260, v.y + 40);
+            const A0 = new Vec2(v.x - 170, v.y - 160);
+            const B0 = new Vec2(v.x - 60, v.y + 120);
+            const K1 = new Vec2(v.x, v.y + 20);
+            const A1 = new Vec2(v.x + 60, v.y + 220);
+            const B1 = new Vec2(v.x + 170, v.y - 140);
+            const K2 = new Vec2(v.x + 260, v.y + 30);
+
+            points = [K0, A0, B0, K1, A1, B1, K2];
+            break;
+          }
+
+          case 'scene-c1': {
+            const K0 = new Vec2(v.x - 260, v.y + 40);
+            const A0 = new Vec2(v.x - 170, v.y - 160);
+            const B0 = new Vec2(v.x - 70, v.y + 120);
+            const K1 = new Vec2(v.x, v.y + 20);
+            const A1 = new Vec2(2 * K1.x - B0.x, 2 * K1.y - B0.y);
+            const B1 = new Vec2(v.x + 170, v.y - 140);
+            const K2 = new Vec2(v.x + 260, v.y + 30);
+
+            points = [K0, A0, B0, K1, A1, B1, K2];
+            c1MasterIndex = 2;
+            break;
+          }
+
+          case 'scene-c2':
+            points = [
+              new Vec2(v.x - 220, v.y + 20),
+              new Vec2(v.x - 110, v.y - 120),
+              new Vec2(v.x, v.y + 10),
+              new Vec2(v.x + 110, v.y + 130),
+              new Vec2(v.x + 220, v.y - 10)
+            ];
+            c2CompareOffset = Math.round(Math.min(H * 0.26, W < 768 ? 170 : 240));
+            break;
+
+          case 'scene-matrix':
+          case 'scene-spline':
+            window.generateRandomSpline();
+            break;
+
+          case 'scene-osu':
+            window.resetOsuGame();
+            break;
+        }
+      };
+
+      window.generateRandomSpline = () => {
+        points = [];
+        const v = getVizCenter();
+        const count = 5 + Math.floor(Math.random() * 3);
+        const totalW = Math.min(500, W * 0.4);
+
+        for (let i = 0; i < count; i++) {
+          points.push(new Vec2(
+            v.x - totalW / 2 + i * (totalW / (count - 1)),
+            H / 2 + (Math.random() - 0.5) * 320
+          ));
+        }
+      };
+
+      window.resetOsuGame = (startPoint = null) => {
+        osuTrail = [];
+
+        const count = 5 + Math.floor(Math.random() * 3);
+
+        let pos = startPoint ? startPoint.copy() : new Vec2(W * 0.65, H / 2);
+
+        points = [];
+        points.push(pos.copy());
+
+        for (let i = 1; i < count; i++) {
+          pos = new Vec2(
+            Math.max(W * 0.4, Math.min(W - 80, pos.x + (Math.random() - 0.5) * 380)),
+            Math.max(80, Math.min(H - 80, pos.y + (Math.random() - 0.5) * 280))
+          );
+          points.push(pos.copy());
+        }
+
+        osuPath = solveC2Spline(points);
+        osuSegmentIndex = 0;
+        osuProgress = 0;
+      };
+
+      const animate = () => {
+        ctx.clearRect(0, 0, W, H);
+        time += 0.01;
+
+        const pingPong = (Math.sin(time * 1.5) + 1) / 2;
+
+        if (vizEnabled) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+          ctx.lineWidth = 1;
+          for (let x = 0; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+          for (let y = 0; y < H; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+        }
+
+        drawParticles();
+
+        if (!vizEnabled) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        if (scene === 'scene-intro') {
+          const spline = solveC2Spline(points);
+          for (const seg of spline) drawBezierCurve(seg, 'rgba(255,102,170,0.18)', 2);
+
+          points.forEach((p, i) => {
+            p.x += Math.cos(time * 0.7 + i * 1.1) * 0.4;
+            p.y += Math.sin(time * 0.6 + i * 0.9) * 0.4;
+            drawPoint(p, 'rgba(255,102,170,0.35)', 3);
+          });
+        } else if (scene === 'scene-compare') {
+          const off = compareOffset;
+
+          ctx.beginPath();
+          for (let i = 0; i < points.length; i++) {
+            const px = points[i].x;
+            const py = points[i].y - off;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = '#666';
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          points.forEach((p) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y - off, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#666';
+            ctx.fill();
+          });
+
+          const spline = solveC2Spline(points);
+          for (const seg of spline) drawBezierCurve(seg, '#ff66aa', 4);
+          points.forEach((p) => drawPoint(p, '#fff', 5));
+        } else if (scene === 'scene-lerp-1d') {
+          const A = points[0];
+          const B = points[1];
+          const u = pingPongWithHolds(time, 0.12, 0.20);
+          const tMin = 0.20;
+          const t = tMin + (1 - tMin) * u;
+          const P = A.lerp(B, t);
+
+          const xMin = Math.min(A.x, B.x);
+          const xMax = Math.max(A.x, B.x);
+          const y = A.y;
+
+          drawLine(new Vec2(xMin - 60, y), new Vec2(xMax + 60, y), 'rgba(255,255,255,0.10)', 2);
+          drawLine(A, B, 'rgba(255,255,255,0.22)', 6);
+          drawLine(A, P, 'rgba(255,102,170,0.95)', 8);
+
+          const tick = (x, col) => drawLine(new Vec2(x, y - 10), new Vec2(x, y + 10), col, 2);
+          tick(A.x, 'rgba(255,102,170,0.55)');
+          tick(P.x, 'rgba(255,217,102,0.65)');
+          tick(B.x, 'rgba(102,204,255,0.55)');
+
+          drawEmphPoint(A, '#ff66aa', 8, { glowR: 20, glowA: 0.22 });
+          drawEmphPoint(B, '#66ccff', 8, { glowR: 20, glowA: 0.22 });
+          drawEmphPoint(P, '#ffd966', 10, { glowR: 24, glowA: 0.28, stroke: 'rgba(255,255,255,0.95)', strokeW: 1.8 });
+
+          ctx.save();
+          ctx.font = 'bold 13px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillStyle = 'rgba(255,255,255,0.70)';
+          ctx.fillText('A', A.x, y - 14);
+          ctx.fillText('P', P.x, y - 14);
+          ctx.fillText('B', B.x, y - 14);
+          ctx.restore();
+
+          const brTop = y + 30;
+          drawSquareRangeBracket(A.x, P.x, brTop, { depth: 18 });
+          drawLabelPill(`t = ${t.toFixed(2)}`, (A.x + P.x) / 2, brTop + 22, {
+            font: 'bold 18px monospace',
+            padX: 12,
+            padY: 7,
+            bg: 'rgba(0,0,0,0.42)',
+            border: 'rgba(255,102,170,0.22)',
+            color: 'rgba(255,255,255,0.95)',
+            r: 10
+          });
+        } else if (scene === 'scene-lerp') {
+          const p = points[0].lerp(points[1], pingPong);
+
+          drawLine(points[0], points[1], '#555', 2, [8, 4]);
+          drawPoint(points[0], '#ff66aa', 8, 'A');
+          drawPoint(points[1], '#66ccff', 8, 'B');
+          drawPoint(p, '#ffd966', 11);
+
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 14px monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`t = ${pingPong.toFixed(2)}`, p.x + 18, p.y - 2);
+
+          ctx.fillStyle = 'rgba(255,102,170,0.6)';
+          ctx.font = '12px monospace';
+          ctx.fillText(`(1-t)=${(1 - pingPong).toFixed(2)}`, points[0].x, points[0].y + 24);
+
+          ctx.fillStyle = 'rgba(102,204,255,0.6)';
+          ctx.fillText(`t=${pingPong.toFixed(2)}`, points[1].x, points[1].y + 24);
+        } else if (scene === 'scene-control') {
+          const [P0, P1, P2] = points;
+
+          drawDashedEmph(P0, P1, 'rgba(255,255,255,0.30)', { dash: [12, 7], w: 2.4, glowW: 8, glowA: 0.06 });
+          drawDashedEmph(P1, P2, 'rgba(255,255,255,0.30)', { dash: [12, 7], w: 2.4, glowW: 8, glowA: 0.06 });
+
+          drawEmphPoint(P0, '#ffffff', 7.2, { glowR: 18, glowA: 0.18, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+          drawEmphPoint(P1, '#ffd966', 6.6, { glowR: 18, glowA: 0.26, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+          drawEmphPoint(P2, '#ffffff', 7.2, { glowR: 18, glowA: 0.18, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+
+          ctx.save();
+          ctx.font = 'bold 13px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillStyle = 'rgba(255,255,255,0.70)';
+          ctx.fillText('P0', P0.x, P0.y - 12);
+          ctx.fillText('P1', P1.x, P1.y - 12);
+          ctx.fillText('P2', P2.x, P2.y - 12);
+          ctx.restore();
+        } else if (scene === 'scene-casteljau') {
+          const t = rampUpHoldReset(time, 0.20, 0.05);
+          casteljauStageAnim += (casteljauStageTarget - casteljauStageAnim) * 0.18;
+
+          const a1 = smoothstep(clamp01(casteljauStageAnim - 0));
+          const a2 = smoothstep(clamp01(casteljauStageAnim - 1));
+          const a3 = smoothstep(clamp01(casteljauStageAnim - 2));
+          const a4 = smoothstep(clamp01(casteljauStageAnim - 3));
+
+          const P0 = points[0];
+          const P1 = points[1];
+          const P2 = points[2];
+
+          drawDashedEmph(P0, P1, 'rgba(255,255,255,0.28)', { dash: [12, 7], w: 2.2, glowW: 8, glowA: 0.06 });
+          drawDashedEmph(P1, P2, 'rgba(255,255,255,0.28)', { dash: [12, 7], w: 2.2, glowW: 8, glowA: 0.06 });
+
+          drawEmphPoint(P0, '#ffffff', 7.2, { glowR: 18, glowA: 0.18, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+          drawEmphPoint(P1, '#ffd966', 6.4, { glowR: 18, glowA: 0.26, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+          drawEmphPoint(P2, '#ffffff', 7.2, { glowR: 18, glowA: 0.18, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+
+          ctx.save();
+          ctx.font = 'bold 20px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillStyle = 'rgba(255,255,255,0.75)';
+          ctx.fillText('P0', P0.x, P0.y - 20);
+          ctx.fillText('P1', P1.x, P1.y - 20);
+          ctx.fillText('P2', P2.x, P2.y - 20);
+          ctx.restore();
+
+          const Q0 = P0.lerp(P1, t);
+          const Q1 = P1.lerp(P2, t);
+
+          drawEmphPointMul(Q0, 'rgba(102,204,255,1)', 5.2, a1, { glowR: 14, glowA: 0.22 });
+          drawEmphPointMul(Q1, 'rgba(102,204,255,1)', 5.2, a1, { glowR: 14, glowA: 0.22 });
+
+          if (a1 > 0.01) {
+            ctx.save();
+            ctx.font = 'bold 20px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = `rgba(255,255,255,${0.80 * a1})`;
+            ctx.fillText('Q0', Q0.x, Q0.y - 20);
+            ctx.fillText('Q1', Q1.x, Q1.y - 20);
+            ctx.restore();
+          }
+
+          drawDashedEmphMul(Q0, Q1, 'rgba(102,255,170,0.95)', a2, { dash: [8, 6], w: 2.4, glowW: 9, glowA: 0.10 });
+
+          const Pt = Q0.lerp(Q1, t);
+          drawEmphPointMul(Pt, '#ffd966', 8.2, a3, { glowR: 20, glowA: 0.30, stroke: 'rgba(255,255,255,0.95)', strokeW: 1.8 });
+
+          if (a3 > 0.01) {
+            ctx.save();
+            ctx.font = 'bold 20px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = `rgba(255,255,255,${0.90 * a3})`;
+            ctx.fillText('P', Pt.x, Pt.y - 14);
+            ctx.restore();
+          }
+
+          if (a4 > 0.01) drawBezierCurvePartial(points, t, colorWithAlpha('#ff66aa', 0.95 * a4), 4.2, 320);
+
+          if (a1 > 0.01) {
+            const v = getVizCenter();
+            ctx.save();
+            ctx.fillStyle = `rgba(255,255,255,${0.55 * a1})`;
+            ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`t = ${t.toFixed(2)}`, v.x, v.y + 190);
+            ctx.restore();
+          }
+        } else if (scene === 'scene-quad' || scene === 'scene-cubic') {
+          const t = pingPongWithHolds(time, 0.17, 0.14);
+
+          for (let i = 0; i < points.length - 1; i++) {
+            drawDashedEmph(points[i], points[i + 1], 'rgba(255,255,255,0.26)', { dash: [12, 7], w: 2.2, glowW: 8, glowA: 0.07 });
+          }
+
+          drawBezierCurvePartial(points, t, '#ff66aa', 4.2, 320);
+
+          if (points.length === 3) {
+            const m0 = points[0].lerp(points[1], t);
+            const m1 = points[1].lerp(points[2], t);
+
+            drawDashedEmph(m0, m1, 'rgba(102,204,255,0.55)', { dash: [8, 6], w: 2.2, glowW: 7, glowA: 0.10 });
+            drawEmphPoint(m0, 'rgba(102,204,255,0.95)', 5, { glowR: 14, glowA: 0.25 });
+            drawEmphPoint(m1, 'rgba(102,204,255,0.95)', 5, { glowR: 14, glowA: 0.25 });
+
+            const q = m0.lerp(m1, t);
+            drawEmphPoint(q, '#ffd966', 8, { glowR: 20, glowA: 0.30, stroke: 'rgba(255,255,255,0.95)', strokeW: 1.8 });
+          } else if (points.length === 4) {
+            const m0 = points[0].lerp(points[1], t);
+            const m1 = points[1].lerp(points[2], t);
+            const m2 = points[2].lerp(points[3], t);
+
+            drawDashedEmph(m0, m1, 'rgba(102,204,255,0.42)', { dash: [8, 6], w: 2.0, glowW: 7, glowA: 0.08 });
+            drawDashedEmph(m1, m2, 'rgba(102,204,255,0.42)', { dash: [8, 6], w: 2.0, glowW: 7, glowA: 0.08 });
+
+            drawEmphPoint(m0, 'rgba(102,204,255,0.9)', 4.8, { glowR: 13, glowA: 0.22 });
+            drawEmphPoint(m1, 'rgba(102,204,255,0.9)', 4.8, { glowR: 13, glowA: 0.22 });
+            drawEmphPoint(m2, 'rgba(102,204,255,0.9)', 4.8, { glowR: 13, glowA: 0.22 });
+
+            const q0 = m0.lerp(m1, t);
+            const q1 = m1.lerp(m2, t);
+
+            drawDashedEmph(q0, q1, 'rgba(102,255,170,0.48)', { dash: [7, 5], w: 2.2, glowW: 8, glowA: 0.10 });
+            drawEmphPoint(q0, 'rgba(102,255,170,0.95)', 5.2, { glowR: 14, glowA: 0.22 });
+            drawEmphPoint(q1, 'rgba(102,255,170,0.95)', 5.2, { glowR: 14, glowA: 0.22 });
+
+            const r = q0.lerp(q1, t);
+            drawEmphPoint(r, '#ffd966', 8, { glowR: 20, glowA: 0.30, stroke: 'rgba(255,255,255,0.95)', strokeW: 1.8 });
+          }
+
+          points.forEach((pt, i) => {
+            const isCtrl = i > 0 && i < points.length - 1;
+            if (isCtrl) drawEmphPoint(pt, '#ffd966', 6.4, { glowR: 18, glowA: 0.26, stroke: 'rgba(255,255,255,0.85)', strokeW: 1.6 });
+            else drawEmphPoint(pt, '#ffffff', 7.2, { glowR: 18, glowA: 0.18, stroke: 'rgba(255,255,255,0.90)', strokeW: 1.6 });
+          });
+
+          ctx.fillStyle = 'rgba(255,255,255,0.55)';
+          ctx.font = '12px monospace';
+          ctx.textAlign = 'center';
+          const v = getVizCenter();
+          ctx.fillText(`t = ${t.toFixed(2)}`, v.x, v.y + 190);
+        } else if (scene === 'scene-runge') {
+          drawSceneRunge();
+        } else if (scene === 'scene-c0') {
+          const p = points;
+          if (p.length < 7) { requestAnimationFrame(animate); return; }
+
+          const K0 = p[0], A0 = p[1], B0 = p[2], K1 = p[3], A1 = p[4], B1 = p[5], K2 = p[6];
+
+          const segL = [K0, A0, B0, K1];
+          const segR = [K1, A1, B1, K2];
+
+          drawBezierCurve(segL, '#ff66aa', 3.4);
+          drawBezierCurve(segR, '#66ccff', 3.4);
+
+          const polyCol = 'rgba(255,255,255,0.14)';
+          drawLine(K0, A0, polyCol, 1.6, [10, 6]);
+          drawLine(A0, B0, polyCol, 1.6, [10, 6]);
+          drawLine(B0, K1, polyCol, 1.6, [10, 6]);
+
+          drawLine(K1, A1, polyCol, 1.6, [10, 6]);
+          drawLine(A1, B1, polyCol, 1.6, [10, 6]);
+          drawLine(B1, K2, polyCol, 1.6, [10, 6]);
+
+          const tL = K1.sub(B0);
+          const tR = A1.sub(K1);
+
+          const eps = 1e-6;
+          const lenL = tL.len();
+          const lenR = tR.len();
+
+          let g1OK = false;
+          if (lenL > eps && lenR > eps) {
+            const dot = tL.x * tR.x + tL.y * tR.y;
+            if (dot > 0) {
+              let cos = dot / (lenL * lenR);
+              cos = Math.max(-1, Math.min(1, cos));
+              const angleDeg = Math.acos(cos) * 180 / Math.PI;
+              g1OK = angleDeg < 12;
+            }
+          }
+
+          const drawTangentThrough = (pivot, dir, backLen, fwdLen, color) => {
+            const L = dir.len();
+            if (L < eps) return;
+            const u = dir.mult(1 / L);
+            const a = pivot.sub(u.mult(backLen));
+            const b = pivot.add(u.mult(fwdLen));
+            drawLine(a, b, color, 2.0, [7, 5]);
+          };
+
+          const minExtend = 90;
+          const pad = 25;
+
+          if (g1OK) {
+            drawTangentThrough(K1, tL, Math.max(minExtend, lenL) + pad, Math.max(minExtend, lenR) + pad, 'rgba(102,255,170,0.55)');
+          } else {
+            drawTangentThrough(K1, tL, Math.max(minExtend, lenL) + pad, minExtend, 'rgba(255,255,255,0.20)');
+            drawTangentThrough(K1, tR, minExtend, Math.max(minExtend, lenR) + pad, 'rgba(255,255,255,0.20)');
+          }
+
+          ctx.beginPath();
+          ctx.arc(K1.x, K1.y, 16, 0, Math.PI * 2);
+          ctx.setLineDash([4, 3]);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = g1OK ? 'rgba(102,255,170,0.80)' : 'rgba(255,60,60,0.75)';
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          drawPoint(K0, '#fff', 5, 'K0');
+          drawPoint(A0, '#ffd966', 5, 'A0');
+          drawPoint(B0, '#ffd966', 5, 'B0');
+
+          drawPoint(K1, g1OK ? '#66ffaa' : '#ff4444', 6, g1OK ? 'K1 (Гладкость ✓)' : 'K1 (стык)');
+          drawPoint(A1, '#ffd966', 5, 'A1');
+          drawPoint(B1, '#ffd966', 5, 'B1');
+          drawPoint(K2, '#fff', 5, 'K2');
+
+          ctx.fillStyle = g1OK ? 'rgba(102,255,170,0.55)' : 'rgba(255,255,255,0.25)';
+          ctx.font = '12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(g1OK ? 'Касательные совпали' : 'Касательные разные', K1.x, K1.y - 24);
+        } else if (scene === 'scene-c1') {
+          const p = points;
+          if (p.length < 7) { requestAnimationFrame(animate); return; }
+
+          const K = p[3];
+
+          const otherIndex = (c1MasterIndex === 2) ? 4 : 2;
+          const master = p[c1MasterIndex];
+          p[otherIndex].x = 2 * K.x - master.x;
+          p[otherIndex].y = 2 * K.y - master.y;
+
+          const segL = [p[0], p[1], p[2], p[3]];
+          const segR = [p[3], p[4], p[5], p[6]];
+
+          drawBezierCurve(segL, '#ff66aa', 3.4);
+          drawBezierCurve(segR, '#66ccff', 3.4);
+
+          drawLine(p[0], p[1], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+          drawLine(p[1], p[2], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+          drawLine(p[2], p[3], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+
+          drawLine(p[3], p[4], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+          drawLine(p[4], p[5], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+          drawLine(p[5], p[6], 'rgba(255,255,255,0.14)', 1.6, [10, 6]);
+
+          drawLine(p[2], p[4], 'rgba(255,255,255,0.28)', 2.0, [7, 5]);
+
+          ctx.beginPath();
+          ctx.arc(K.x, K.y, 16, 0, Math.PI * 2);
+          ctx.setLineDash([4, 3]);
+          ctx.strokeStyle = 'rgba(102,255,170,0.80)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          drawPoint(p[0], '#fff', 5, 'K0');
+          drawPoint(p[1], '#ffd966', 5, 'A0');
+          drawPoint(p[2], '#ffd966', 5, 'B0');
+          drawPoint(p[3], '#66ffaa', 6, 'K1 (C1)');
+          drawPoint(p[4], '#ffd966', 5, 'A1');
+          drawPoint(p[5], '#ffd966', 5, 'B1');
+          drawPoint(p[6], '#fff', 5, 'K2');
+
+          ctx.fillStyle = 'rgba(102,255,170,0.55)';
+          ctx.font = '12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Общая касательная (C1)', K.x, K.y - 22);
+        } else if (scene === 'scene-c2') {
+          const off = c2CompareOffset;
+
+          const knotsBottom = points;
+          const knotsTop = points.map((p) => new Vec2(p.x, p.y - off));
+
+          const c2 = solveC2Spline(knotsBottom);
+          const c1 = solveC1BezierChain(knotsTop, 0.85);
+
+          for (const seg of c1) drawBezierCurve(seg, 'rgba(102,204,255,0.75)', 3);
+          for (const seg of c2) drawBezierCurve(seg, '#ff66aa', 4);
+
+          drawCurvatureCombs(c1, {
+            scale: 950,
+            step: 0.010,
+            maxLen: 100,
+            alpha: 0.34,
+            envelopeAlpha: 0.30,
+            drawEnvelope: true
+          });
+
+          drawCurvatureCombs(c2, {
+            scale: 950,
+            step: 0.010,
+            maxLen: 100,
+            alpha: 0.45,
+            envelopeAlpha: 0.22,
+            drawEnvelope: true
+          });
+
+          drawCurvatureJumpMarkersC1(c1, knotsTop, { scale: 950, thresholdPx: 14 });
+
+          for (const p of points) {
+            drawPoint(new Vec2(p.x, p.y - off), '#66ccff', 5);
+            drawPoint(p, '#fff', 5);
+          }
+        } else if (scene === 'scene-matrix' || scene === 'scene-spline') {
+          const spline = solveC2Spline(points);
+
+          if (scene === 'scene-matrix') {
+            ctx.beginPath();
+            for (let i = 0; i < points.length; i++) {
+              if (i === 0) ctx.moveTo(points[i].x, points[i].y);
+              else ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+
+          for (const seg of spline) drawBezierCurve(seg, '#ff66aa', 3);
+
+          if (scene === 'scene-spline') {
+            drawCurvatureCombs(spline, {
+              scale: 400,
+              step: 0.014,
+              maxLen: 80,
+              color: [100, 255, 140],
+              alpha: 0.30,
+              envelopeAlpha: 0.16,
+              drawEnvelope: true
+            });
+          }
+
+          points.forEach((p) => drawPoint(p, '#66ccff', 6));
+        } else if (scene === 'scene-osu') {
+          if (osuPath.length > 0) for (const seg of osuPath) drawBezierCurve(seg, 'rgba(255,102,170,0.06)', 2);
+
+          for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            const done = i < osuSegmentIndex;
+            const current = i === osuSegmentIndex + 1;
+            const alpha = done ? 0.15 : current ? 1 : 0.5;
+
+            if (i <= osuSegmentIndex + 1) {
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, 36, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(0,0,0,${alpha * 0.5})`;
+              ctx.fill();
+
+              const ringColor = done ? 'rgba(102,204,255,0.2)' : `rgba(102,204,255,${alpha})`;
+              ctx.strokeStyle = ringColor;
+              ctx.lineWidth = 3;
+              ctx.stroke();
+
+              ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+              ctx.font = 'bold 18px Arial';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(i + 1, p.x, p.y);
+
+              if (current) {
+                const r = 36 + (1 - osuProgress) * 55;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255,255,255,${0.15 + osuProgress * 0.45})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+              }
+            }
+          }
+
+          if (osuPath.length > 0 && osuSegmentIndex < osuPath.length) {
+            const seg = osuPath[osuSegmentIndex];
+            const cursor = getBezierPoint(seg, osuProgress);
+
+            osuTrail.push({ x: cursor.x, y: cursor.y, a: 1 });
+            if (osuTrail.length > 60) osuTrail.shift();
+
+            for (const tr of osuTrail) {
+              tr.a *= 0.94;
+              ctx.beginPath();
+              ctx.arc(tr.x, tr.y, 5 * tr.a, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255,102,170,${tr.a * 0.5})`;
+              ctx.fill();
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(seg[0].x, seg[0].y);
+            for (let t = 0; t <= osuProgress; t += 0.03) {
+              const tp = getBezierPoint(seg, t);
+              ctx.lineTo(tp.x, tp.y);
+            }
+            ctx.lineTo(cursor.x, cursor.y);
+            ctx.strokeStyle = '#ff66aa';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cursor.x, cursor.y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff66aa';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cursor.x, cursor.y, 10, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cursor.x, cursor.y, 22, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,102,170,0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            osuProgress += osuSpeed;
+
+            if (osuProgress >= 1) {
+              osuProgress = 0;
+              osuSegmentIndex++;
+
+              if (osuSegmentIndex >= osuPath.length) {
+                const last = points.length ? points[points.length - 1] : new Vec2(W * 0.65, H / 2);
+                window.resetOsuGame(last);
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      };
+
+      requestAnimationFrame(animate);
+
+      Reveal.initialize({
+        controls: true,
+        progress: false,
+        center: false,
+        hash: true,
+        mouseWheel: false,
+        transition: 'slide',
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        minScale: 1,
+        maxScale: 1
+      });
+
+      const mjTypeset = (el) => {
+        if (!window.MathJax || typeof MathJax.typesetPromise !== 'function') return;
+        try { MathJax.typesetClear?.([el]); } catch (_) {}
+        MathJax.typesetPromise([el]).catch(() => {});
+      };
+
+      const syncCasteljauStage = (hard = false) => {
+        const cs = Reveal.getCurrentSlide?.();
+        if (!cs) {
+          casteljauStageTarget = 0;
+          if (hard) casteljauStageAnim = 0;
+          return;
+        }
+
+        const st = cs.getAttribute('data-state');
+        if (st !== 'scene-casteljau') {
+          casteljauStageTarget = 0;
+          if (hard) casteljauStageAnim = 0;
+          return;
+        }
+
+        const idx = Reveal.getIndices?.() || {};
+        const stage = (idx.f == null) ? 0 : Math.max(0, Math.min(4, idx.f + 1));
+        casteljauStageTarget = stage;
+        if (hard) casteljauStageAnim = casteljauStageTarget;
+      };
+
+      Reveal.on('ready', (e) => {
+        syncCasteljauStage(true);
+        mjTypeset(e.currentSlide);
+      });
+
+      Reveal.on('fragmentshown', (e) => {
+        syncCasteljauStage(false);
+        mjTypeset(e.fragment);
+      });
+
+      Reveal.on('fragmenthidden', () => {
+        syncCasteljauStage(false);
+      });
+
+      Reveal.on('slidechanged', (event) => {
+        saveSceneState();
+
+        const isChapter = event.currentSlide.classList.contains('chapter-slide');
+        setVizEnabled(!isChapter);
+
+        if (!isChapter) {
+          const state = event.currentSlide.getAttribute('data-state');
+          if (state && state !== scene) initScene(state);
+          else if (state) sceneLabel.textContent = state;
+          mjTypeset(event.currentSlide);
+        }
+
+        const total = Reveal.getTotalSlides();
+        const current = Reveal.getSlidePastCount() + 1;
+        progressBar.style.width = `${(current / total) * 100}%`;
+
+        syncCasteljauStage(true);
+      });
+
+      window.addEventListener('load', () => {
+        try { new QRCode(document.getElementById('qr-code'), { text: 'https://github.com', width: 80, height: 80 }); } catch (_) {}
+        try { new QRCode(document.getElementById('qr-tg'), { text: 'https://t.me', width: 80, height: 80 }); } catch (_) {}
+
+        const cs = Reveal.getCurrentSlide?.();
+        const isChapter = cs && cs.classList.contains('chapter-slide');
+        setVizEnabled(!isChapter);
+
+        if (!isChapter) {
+          const st = cs.getAttribute('data-state');
+          initScene(st || 'scene-intro');
+        }
+
+        initParticles();
+      });
+
+      window.addEventListener('beforeunload', saveSceneState);
+    })();
+  </script>
+</body>
+</html>
